@@ -6,6 +6,7 @@ public class Registro
     public static final int tf=1022;
     private int numero; //4 bytes
     private char lixo[] = new char[tf]; //2044 bytes
+    public Registro(){}
     public Registro(int numero)
     {
         this.numero=numero;
@@ -35,5 +36,12 @@ public class Registro
         //--------------------------------------
         // 2048 bytes
         return(2048);
+    }
+
+    public int getNumero() {
+        return numero;
+    }
+    public void setNumero(int numero) {
+        this.numero = numero;
     }
 }

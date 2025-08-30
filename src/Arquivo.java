@@ -100,75 +100,77 @@ public class Arquivo{
     }
 
     public void insercaoDireta() {
+        Registro reg = new Registro();
             long n = Registro.tf / tamInt;
             for(int i = 1; i < n; i++){
                 seekArq(i);
-                int aux = re;
+                reg.leDoArq(arquivo);
+                int aux = reg.getNumero();
 
-                long j = i-1;
+                int j = i-1;
                 boolean cond = true;
                 while(j>=0){
-                    arquivo.seek(j*tamInt);
-                    int anterior = arquivo.readInt();
+                    seekArq(j);
+                    reg.leDoArq(arquivo);
+                    int anterior = reg.getNumero();
                     if(aux<anterior){
-                        arquivo.seek((j+1)*tamInt);
-                        arquivo.writeInt(anterior);
+                        seekArq(j+1);
+                        reg.setNumero(anterior);
+                        reg.gravaNoArq(arquivo);
                     }
                     else
                         cond = false;
                     j--;
                 }
-
-                arquivo.seek((j+1)*tamInt);
-                arquivo.writeInt(aux);
+                seekArq(j+1);
+                reg.setNumero(aux);
+                reg.gravaNoArq(arquivo);
             }
     }
 
-    public long buscaBinaria(int target, long tl){
-        long inicio = 0, fim = tl, meio=fim/2;
-        try{
-            arquivo.seek((fim-1)*tamInt);
-            if(target < arquivo.readInt()){
-                arquivo.seek(meio*tamInt);
-                while(inicio<fim){
-                    if(arquivo.readInt()>target){
-                        fim = meio-1;
-                    }
-                    else{
-                        inicio=meio+1;
-                    }
-                    meio = (inicio+fim)/2;
-                    arquivo.seek(meio*tamInt);
+    public int buscaBinaria(int target, int tl){
+        int inicio = 0, fim = tl, meio=fim/2;
+        Registro reg = new Registro();
+        seekArq(fim-1);
+        reg.leDoArq(arquivo);
+        if(target < reg.getNumero()){
+            seekArq(meio);
+            while(inicio<fim){
+                reg.leDoArq(arquivo);
+                if(reg.getNumero()>target){
+                    fim = meio-1;
                 }
-                return meio;
+                else{
+                    inicio=meio+1;
+                }
+                meio = (inicio+fim)/2;
+                seekArq(meio);
             }
-            return tl;
+            return meio;
         }
-        catch (Exception e){
-            System.out.printf("Erro ao buscar arquivo: %s\n", e.getMessage());
-        }
-        return -1;
+        return tl;
     }
 
     public void insercaoBinaria(){
         int aux;
-        long n = Registro.tf/tamInt, pos;
-        try{
-            for(long i = 1; i < n; i++){
-                arquivo.seek(i*tamInt);
-                aux = arquivo.readInt();
-                pos = buscaBinaria(aux, i);
-                for(long j = i; j>pos; j--){
-                    arquivo.seek((j-1)*tamInt);
-                    int value = arquivo.readInt();
-                    arquivo.seek(j*tamInt);
-                    arquivo.writeInt(value);
-                }
-                arquivo.seek(pos*tamInt);
-                arquivo.writeInt(aux);
+        int n = Registro.tf/tamInt, pos;
+        Registro reg = new Registro();
+        for(int i = 1; i < n; i++){
+            seekArq(i);
+            reg.leDoArq(arquivo);
+            aux = reg.getNumero();
+            pos = buscaBinaria(aux, i);
+            for(int j = i; j>pos; j--){
+                seekArq(j-1);
+                reg.leDoArq(arquivo);
+                int value = reg.getNumero();
+                seekArq(j);
+                reg.setNumero(value);
+                reg.gravaNoArq(arquivo);
             }
-        }catch(IOException e){
-            System.out.printf("Erro ao ordenar arquivo: %s\n", e.getMessage());
+            seekArq(pos);
+            reg.setNumero(aux);
+            reg.gravaNoArq(arquivo);
         }
     }
 }
