@@ -7,7 +7,6 @@ public class Main
     public void geraTabela()
     {
         insercaoDireta();
-        //e assim continua para os outros métodos de ordenacao!!!
     }
 
     public void gravaLinhaTabela(int compO, int compOEq, int movO, int movOEq, long tempo,
@@ -17,8 +16,13 @@ public class Main
     }
 
     public void gerarArquivos(){
+        arqOrd = new Arquivo("arqOrdenado.bin");
         arqOrd.geraArquivoOrdenado();
+
+        arqRev = new Arquivo("arqReverso.bin");
         arqRev.geraArquivoReverso();
+
+        arqRand = new Arquivo("arqRandomico.bin");
         arqRand.geraArquivoRandomico();
     }
     public void insercaoDireta(){
@@ -38,6 +42,7 @@ public class Main
         var tempo_totalO=tempo_fim-tempo_ini;
 
         //Arquivo Reverso
+        auxRev = new Arquivo("arqReverso - Copia.bin");
         auxRev.copiaArquivo(arqRev.getFile()); //faz uma cópia do arquivo de arqRev
         // para auxRev para preservar o original
         auxRev.initComp();

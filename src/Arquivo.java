@@ -1,8 +1,7 @@
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Random;
-import java.util.RandomAccess;
-import java.util.random.RandomGenerator;
 
 /*
 *  DEVEMOS GRAVAR O REGISTRO
@@ -14,11 +13,24 @@ public class Arquivo{
     private String nomearquivo;
     private RandomAccessFile arquivo;
     private int comp, mov;
-    public Arquivo(String nomearquivo) {
+    public Arquivo(String nomearquivo){
         this.nomearquivo = nomearquivo;
+        try{
+            this.arquivo = new RandomAccessFile(this.nomearquivo, "rw");
+        }catch(FileNotFoundException e){
+            this.arquivo = null;
+        }
     }
     public void copiaArquivo(RandomAccessFile arquivoOrigem){
-        arquivo = arquivoOrigem;
+        Registro registro = new Registro();
+        try{
+            while(arquivoOrigem.getFilePointer()<arquivoOrigem.length()){
+                this.arquivo.seek(arquivoOrigem.getFilePointer());
+                this.arquivo.writeByte(arquivoOrigem.readByte());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     public RandomAccessFile getFile() {
         return arquivo;
