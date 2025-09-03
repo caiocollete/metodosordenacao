@@ -220,5 +220,180 @@ public class Arquivo{
         }
 
     }
+
+    public void selectionSort(){
+        int posmenor, aux, j;
+        long tl=filesize();
+        Registro reg = new Registro();
+        Registro reg2 = new Registro();
+        for( int i = 0; i < tl; i++) {
+            posmenor = i;
+            seekArq(posmenor);
+            reg.leDoArq(arquivo);
+            for( j = i; j < tl; j++) {
+                seekArq(j);
+                reg2.leDoArq(arquivo);
+                addComp();
+                if(reg.getNumero() > reg2.getNumero()) {
+                    posmenor = j;
+                }
+            }
+
+            seekArq(i);
+            reg2.leDoArq(arquivo);
+            aux = reg2.getNumero();
+
+            seekArq(posmenor);
+            reg.leDoArq(arquivo);
+            reg2.setNumero(reg.getNumero());
+
+            reg.setNumero(aux);
+            seekArq(posmenor);
+            reg.gravaNoArq(arquivo);
+
+            addMov();
+        }
+    }
+
+    public void shakeSort() {
+        int inicio = 0, fim = (int)filesize()-1, aux;
+        boolean flag = true;
+        Registro reg = new Registro();
+        Registro reg2 = new Registro();
+        while(inicio<fim && flag) {
+            flag = false;
+            for(int i = inicio; i<fim-1; i++) {
+                seekArq(i);
+                reg.leDoArq(arquivo);
+                reg2.leDoArq(arquivo);
+                addComp();
+                if(reg.getNumero() > reg2.getNumero()) {
+
+                    aux = reg.getNumero();
+                    reg.setNumero(reg2.getNumero());
+                    reg2.setNumero(aux);
+
+                    seekArq(i);
+                    reg.gravaNoArq(arquivo);
+                    reg2.gravaNoArq(arquivo);
+                    addMov();
+                    flag = true;
+                }
+            }
+            fim--;
+
+            for(int i=fim; i>inicio; i--) {
+                seekArq(i-1);
+                reg2.leDoArq(arquivo);
+                reg.leDoArq(arquivo);
+                if(reg.getNumero() < reg2.getNumero()) {
+                    aux = reg.getNumero();
+                    reg.setNumero(reg2.getNumero());
+                    reg2.setNumero(aux);
+
+                    seekArq(i-1);
+                    reg2.gravaNoArq(arquivo);
+                    reg.gravaNoArq(arquivo);
+                    flag = true;
+                }
+            }
+            inicio++;
+        }
+    }
+
+    public void heapSort() {
+        // baseado em arvore
+        // construir uma arvore heap (filhos menor que o pai)
+        // if dir = 2*n+2
+        // if esc = 2*n+1
+        // devemos comecar pelo ultimo
+        int pai, fe, fd, maior, aux;
+        Registro reg = new Registro();
+        Registro reg2 = new Registro();
+        for(int tl = (int)filesize(); tl>1; tl--) {
+            pai = tl/2-1;
+            while(pai>=0){
+                fe = pai*2+1;
+                fd = fe+1;
+
+                seekArq(fe);
+                reg.leDoArq(arquivo);
+                seekArq(fd);
+                reg2.leDoArq(arquivo);
+                if(fd < tl && reg.getNumero() < reg2.getNumero())
+                    maior = fd;
+                else
+                    maior = fe;
+
+                seekArq(maior);
+                reg.leDoArq(arquivo);
+                seekArq(pai);
+                reg2.leDoArq(arquivo);
+                addComp();
+                if(reg.getNumero() > reg2.getNumero()) {
+                    aux = reg.getNumero();
+                    reg.setNumero(reg2.getNumero());
+                    reg2.setNumero(aux);
+
+                    seekArq(maior);
+                    reg.gravaNoArq(arquivo);
+                    seekArq(pai);
+                    reg2.gravaNoArq(arquivo);
+                    addMov();
+                }
+                pai--;
+            }
+            seekArq(0);
+            reg.leDoArq(arquivo);
+            seekArq(tl);
+            reg2.leDoArq(arquivo);
+            aux = reg.getNumero();
+            reg.setNumero(reg2.getNumero());
+            reg2.setNumero(aux);
+        }
+    }
+
+    public void shellSort() {
+        int dist = 1, pos, aux;
+        Registro reg = new Registro();
+        Registro reg2 = new Registro();
+        while(dist < filesize()) {
+            dist = dist * 3 + 1;
+        }
+        dist = dist/3;
+
+        while(dist > 0) {
+            for(int i=dist; i<filesize(); i++){
+                seekArq(i);
+                reg.leDoArq(arquivo);
+                aux = reg.getNumero();
+                pos=i;
+
+                while(pos >= dist){
+                    seekArq(pos-dist);
+                    reg2.leDoArq(arquivo);
+                    if( aux<reg2.getNumero()) {
+                        reg.setNumero(reg2.getNumero());
+                        seekArq(pos);
+                        reg.gravaNoArq(arquivo);
+
+                        pos=pos-dist;
+                        seekArq(pos);
+                        reg2.leDoArq(arquivo);
+
+                        addMov();
+                        addComp();
+                    }
+                }
+                addComp();
+
+                seekArq(pos);
+                reg.setNumero(aux);
+                reg.gravaNoArq(arquivo);
+                addMov();
+            }
+            dist=dist/3;
+        }
+    }
     //#endregion
 }
