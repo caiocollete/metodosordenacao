@@ -2,19 +2,20 @@ import metodos.*;
 
 public class Main
 {
+    //#region Propriedades
     Arquivo arqOrd, arqRev, arqRand, auxRev, auxRand;
+    //#endregion
 
+    //#region Funções Essenciais
     public void geraTabela()
     {
         insercaoDireta();
     }
-
     public void gravaLinhaTabela(int compO, int compOEq, int movO, int movOEq, long tempo,
                                  int compRev, int compRevEq, int movRev, int movRevEq, long tempoRev,
                                  int compRand, int compRandEq, int movRand, int movRandEq, long tempoRand){
         System.out.printf("...");
     }
-
     public void gerarArquivos(){
         arqOrd = new Arquivo("arqOrdenado.bin");
         arqOrd.geraArquivoOrdenado();
@@ -25,13 +26,16 @@ public class Main
         arqRand = new Arquivo("arqRandomico.bin");
         arqRand.geraArquivoRandomico();
     }
+    //#endregion
+
+    //#region Métodos de Ordenação
     public void insercaoDireta(){
         gerarArquivos();
 
         InsercaoDireta _insercaoDireta = new InsercaoDireta();
         String linha;
 
-        //Arquivo Ordenado
+        //#region Arquivo Ordenado
         arqOrd.initComp();
         arqOrd.initMov();
         var tempo_ini=System.currentTimeMillis(); //metodo para pegar a hora atual em milisegundos
@@ -40,8 +44,9 @@ public class Main
         var compO=arqOrd.getComp();
         var movO=arqOrd.getMov();
         var tempo_totalO=tempo_fim-tempo_ini;
+        //#endregion
 
-        //Arquivo Reverso
+        //#region Arquivo Reverso
         auxRev = new Arquivo("arqReverso - Copia.bin");
         auxRev.copiaArquivo(arqRev.getFile()); //faz uma cópia do arquivo de arqRev
         // para auxRev para preservar o original
@@ -53,8 +58,9 @@ public class Main
         var tempo_totalRev=tempo_fim-tempo_ini;
         var compRev=auxRev.getComp();
         var movRev= auxRev.getMov();
+        //#endregion
 
-        //Arquivo Randomico
+        //#region Arquivo Randomico
         auxRand.copiaArquivo(arqRand.getFile()); //faz uma cópia do arquivo de arqRand
         //para auxRand para preservar o original
         auxRand.initComp();
@@ -65,6 +71,7 @@ public class Main
         var tempo_totalRand=tempo_fim-tempo_ini;
         var compRand=auxRand.getComp();
         var movRand=auxRand.getMov();
+        //#endregion
 
         //grava na tabela informacoes os dados extraídos das execucoes do metodo
         gravaLinhaTabela(compO,
@@ -84,6 +91,8 @@ public class Main
                 tempo_totalRand
         );
     }
+
+    //#endregion
 
     public static void main(String args[])
     {

@@ -9,10 +9,14 @@ import java.util.Random;
 * */
 
 public class Arquivo{
+    //#region Propriedades
     private static int tamInt = 4;
     private String nomearquivo;
     private RandomAccessFile arquivo;
     private int comp, mov;
+    //#endregion
+
+    //#region Funções da Classe
     public Arquivo(String nomearquivo){
         this.nomearquivo = nomearquivo;
         try{
@@ -110,7 +114,9 @@ public class Arquivo{
             reg.gravaNoArq(arquivo);
         }
     }
+    //#endregion
 
+    //#region Metódos de Ordenação
     public void insercaoDireta() {
         Registro reg = new Registro();
             long n = Registro.tf / tamInt;
@@ -121,7 +127,7 @@ public class Arquivo{
 
                 int j = i-1;
                 boolean cond = true;
-                while(j>=0){
+                while(j>=0 && cond){
                     seekArq(j);
                     reg.leDoArq(arquivo);
                     int anterior = reg.getNumero();
@@ -129,26 +135,30 @@ public class Arquivo{
                         seekArq(j+1);
                         reg.setNumero(anterior);
                         reg.gravaNoArq(arquivo);
+                        addMov();
                     }
                     else
                         cond = false;
+                    addComp();
                     j--;
                 }
                 seekArq(j+1);
                 reg.setNumero(aux);
                 reg.gravaNoArq(arquivo);
+                addMov();
             }
     }
-
     public int buscaBinaria(int target, int tl){
         int inicio = 0, fim = tl, meio=fim/2;
         Registro reg = new Registro();
         seekArq(fim-1);
         reg.leDoArq(arquivo);
         if(target < reg.getNumero()){
+            addComp();
             seekArq(meio);
             while(inicio<fim){
                 reg.leDoArq(arquivo);
+                addComp();
                 if(reg.getNumero()>target){
                     fim = meio-1;
                 }
@@ -162,7 +172,6 @@ public class Arquivo{
         }
         return tl;
     }
-
     public void insercaoBinaria(){
         int aux;
         int n = Registro.tf/tamInt, pos;
@@ -179,10 +188,13 @@ public class Arquivo{
                 seekArq(j);
                 reg.setNumero(value);
                 reg.gravaNoArq(arquivo);
+                addMov();
             }
             seekArq(pos);
             reg.setNumero(aux);
             reg.gravaNoArq(arquivo);
+            addMov();
         }
     }
+    //#endregion
 }
