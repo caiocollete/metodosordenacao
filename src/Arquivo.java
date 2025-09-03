@@ -196,5 +196,29 @@ public class Arquivo{
             addMov();
         }
     }
+    public void bubbleSort(){
+        long TL = filesize();
+        boolean flag = true;
+        Registro reg = new Registro();
+        Registro reg2 = new Registro();
+        while(TL>1 && flag){
+            flag = false;
+            for(int i = 1; i < TL-1; i++){
+                seekArq(i);
+                reg.leDoArq(arquivo);
+                reg2.leDoArq(arquivo);
+                if(reg.getNumero()>reg2.getNumero()){
+                    seekArq(i);
+                    reg2.gravaNoArq(arquivo);
+                    reg.gravaNoArq(arquivo);
+                    flag = true;
+                    addMov();
+                    addComp();
+                }
+            }
+            TL--;
+        }
+
+    }
     //#endregion
 }
