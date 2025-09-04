@@ -395,5 +395,59 @@ public class Arquivo{
             dist=dist/3;
         }
     }
+
+    //# Quick Sort (Pivô)
+    public void quickSort_pivot(){
+        ordenate(0, (int)filesize());
+    }
+
+    private void ordenate(int inicio, int fim){
+        if(inicio<fim){
+            int pi = part(inicio, fim);
+            ordenate(inicio, pi-1);
+            ordenate(pi+1, fim);
+        }
+    }
+
+    private int part(int inicio, int fim){
+        Registro reg = new Registro();
+        Registro reg2 = new Registro();
+        seekArq(fim);
+        reg.leDoArq(arquivo);
+        int num = reg.getNumero();
+        int i = (inicio - 1);
+        for (int j = inicio; j < fim; j++) {
+            seekArq(j);
+            reg.leDoArq(arquivo);
+            if (reg.getNumero() < num) {
+                i++;
+                seekArq(i);
+                reg2.leDoArq(arquivo);
+                int temp = reg.getNumero();
+                reg2.setNumero(reg.getNumero());
+                reg.setNumero(temp);
+
+                seekArq(j);
+                reg.gravaNoArq(arquivo);
+                seekArq(i);
+                reg2.gravaNoArq(arquivo);
+            }
+        }
+        seekArq(i+1);
+        reg.leDoArq(arquivo);
+        seekArq(fim);
+        reg2.leDoArq(arquivo);
+        int temp = reg.getNumero();
+        reg.setNumero(reg2.getNumero());
+        reg2.setNumero(temp);
+
+        seekArq(i+1);
+        reg.gravaNoArq(arquivo);
+        seekArq(fim);
+        reg2.gravaNoArq(arquivo);
+
+        return i + 1;
+    }
+    //#endregion
     //#endregion
 }
