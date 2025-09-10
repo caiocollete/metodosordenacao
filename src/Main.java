@@ -1,3 +1,4 @@
+import Arquivo.Arquivo;
 import metodos.*;
 
 public class Main
@@ -27,7 +28,7 @@ public class Main
         InsercaoDireta _insercaoDireta = new InsercaoDireta();
         String linha;
 
-        //Arquivo Ordenado
+        //Arquivo.Arquivo Ordenado
         arqOrd.initComp();
         arqOrd.initMov();
         var tempo_ini=System.currentTimeMillis(); //metodo para pegar a hora atual em milisegundos
@@ -37,7 +38,7 @@ public class Main
         var movO=arqOrd.getMov();
         var tempo_totalO=tempo_fim-tempo_ini;
 
-        //Arquivo Reverso
+        //Arquivo.Arquivo Reverso
         auxRev.copiaArquivo(arqRev.getFile()); //faz uma cópia do arquivo de arqRev
         // para auxRev para preservar o original
         auxRev.initComp();
@@ -49,7 +50,7 @@ public class Main
         var compRev=auxRev.getComp();
         var movRev= auxRev.getMov();
 
-        //Arquivo Randomico
+        //Arquivo.Arquivo Randomico
         auxRand.copiaArquivo(arqRand.getFile()); //faz uma cópia do arquivo de arqRand
         //para auxRand para preservar o original
         auxRand.initComp();
