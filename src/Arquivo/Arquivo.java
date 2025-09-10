@@ -1,8 +1,8 @@
-package Arquivo;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Random;
+import java.util.RandomAccess;
+import java.util.random.RandomGenerator;
 
 /*
 *  DEVEMOS GRAVAR O REGISTRO
@@ -42,14 +42,14 @@ public class Arquivo{
     }
     public void seekArq(int pos) {
         try{
-            arquivo.seek(pos* Registro.length());
+            arquivo.seek(pos*Registro.length());
         } catch (IOException e) {
             System.out.printf("Erro ao seekar arquivo: %s\n", e.getMessage());
         }
     }
     public long filesize() {
         try{
-            return arquivo.length()/ Registro.length();
+            return arquivo.length()/Registro.length();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
