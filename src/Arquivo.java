@@ -320,6 +320,8 @@ public class Arquivo{
                 reg.leDoArq(arquivo);
                 seekArq(fd);
                 reg2.leDoArq(arquivo);
+
+                addComp();
                 if(fd < tl && reg.getNumero() < reg2.getNumero())
                     maior = fd;
                 else
@@ -329,6 +331,7 @@ public class Arquivo{
                 reg.leDoArq(arquivo);
                 seekArq(pai);
                 reg2.leDoArq(arquivo);
+
                 addComp();
                 if(reg.getNumero() > reg2.getNumero()) {
                     aux = reg.getNumero();
@@ -396,7 +399,7 @@ public class Arquivo{
         }
     }
 
-    //# Quick Sort (Pivô)
+    //#region Quick Sort (Pivô)
     public void quickSort_pivot(){
         ordenate(0, (int)filesize());
     }
@@ -419,6 +422,7 @@ public class Arquivo{
         for (int j = inicio; j < fim; j++) {
             seekArq(j);
             reg.leDoArq(arquivo);
+            addComp();
             if (reg.getNumero() < num) {
                 i++;
                 seekArq(i);
@@ -431,6 +435,7 @@ public class Arquivo{
                 reg.gravaNoArq(arquivo);
                 seekArq(i);
                 reg2.gravaNoArq(arquivo);
+                addMov();
             }
         }
         seekArq(i+1);
@@ -445,9 +450,59 @@ public class Arquivo{
         reg.gravaNoArq(arquivo);
         seekArq(fim);
         reg2.gravaNoArq(arquivo);
+        addMov();
 
         return i + 1;
     }
     //#endregion
+
+    //#region Quick Sort (Sem Pivô)
+    public void quickSort_nopivot(){
+        quickSortSP(0, (int)filesize());
+    }
+    public void quickSortSP(int inicio, int fim){
+        int i = inicio, j = fim, aux;
+        boolean flag = true;
+        Registro menor = new Registro();
+        Registro maior = new Registro();
+
+        while(i<j){
+            seekArq(i);
+            menor.leDoArq(arquivo);
+            seekArq(j);
+            maior.leDoArq(arquivo);
+            if(flag){
+                addComp();
+                while(i<j  && menor.getNumero()<=maior.getNumero()){
+                    i++;
+                    seekArq(i);
+                    menor.leDoArq(arquivo);
+                    addComp();
+                }
+            }
+            else{
+                addComp();
+                while(i<j && menor.getNumero()<=maior.getNumero()){
+                    addComp();
+                    j--;
+                    seekArq(j);
+                    maior.leDoArq(arquivo);
+                }
+            }
+            aux = menor.getNumero();
+            menor.setNumero(maior.getNumero());
+            maior.setNumero(aux);
+            addMov();
+            flag = !flag;
+        }
+        if(i+1<fim){
+            quickSortSP(i+1, fim);
+        }
+        if(inicio<j-1){
+            quickSortSP(inicio, j-1);
+        }
+    }
+    //#endregion
+
     //#endregion
 }
