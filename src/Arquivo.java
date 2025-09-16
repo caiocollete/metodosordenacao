@@ -28,8 +28,9 @@ public class Arquivo{
     public void copiaArquivo(RandomAccessFile arquivoOrigem){
         Registro registro = new Registro();
         try{
+            arquivoOrigem.seek(0);
+            this.arquivo.seek(0);
             while(arquivoOrigem.getFilePointer()<arquivoOrigem.length()){
-                this.arquivo.seek(arquivoOrigem.getFilePointer());
                 this.arquivo.writeByte(arquivoOrigem.readByte());
             }
         } catch (IOException e) {
@@ -109,7 +110,7 @@ public class Arquivo{
     }
     public void geraArquivoRandomico() {
         Random rand = new Random();
-        while(!eof()){
+        for(int count = 0; count < Registro.tf; count++) {
             Registro reg = new Registro(rand.nextInt(300000)+2000);
             reg.gravaNoArq(arquivo);
         }
@@ -502,6 +503,65 @@ public class Arquivo{
             quickSortSP(inicio, j-1);
         }
     }
+    //#endregion
+
+    //#region Merge Sort (First Implementation)
+    public void mergeSort_first(){
+        int tl = (int) filesize()/2;
+        int[] v1 = new int[tl], v2 = new int[tl];
+        int seq = 1;
+
+        while(seq<filesize()/2){
+            particao(v1,v2);
+            fusao(v1,v2,seq);
+            seq = seq*2;
+        }
+    }
+
+    public void particao(int[] v1, int[] v2){
+        int i = 0, j = 0, k = 0, tl=(int)filesize()/2;
+        Registro reg = new Registro();
+        while(k<tl){
+            seekArq(k);
+            reg.leDoArq(arquivo);
+            v1[i++] = reg.getNumero();
+            seekArq(k+tl);
+            reg.leDoArq(arquivo);
+            v2[j++] = reg.getNumero();
+            k++;
+        }
+    }
+
+    public void fusao(int[] v1, int[] v2, int seq){
+        int i = 0, j = 0, k = 0, tl=(int)filesize()/2, aux = seq;
+        Registro reg = new Registro();
+        while(k<tl){
+            while(i<seq && j<seq){
+                if(v1[i]<v2[j]){
+                    seekArq(k++);
+                    reg.setNumero(v1[i]);
+                    reg.gravaNoArq(arquivo);
+                }
+                else{
+                    seekArq(k++);
+                    reg.setNumero(v2[j]);
+                    reg.gravaNoArq(arquivo);
+                }
+            }
+            while(i<seq){
+                seekArq(k++);
+                reg.setNumero(v1[i++]);
+                reg.gravaNoArq(arquivo);
+            }
+            while(j<seq){
+                seekArq(k++);
+                reg.setNumero(v2[j++]);
+                reg.gravaNoArq(arquivo);
+            }
+            seq= seq + aux;
+        }
+    }
+
     //#endregion
 
     //#endregion
