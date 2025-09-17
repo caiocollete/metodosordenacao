@@ -1,221 +1,659 @@
-import metodos.*;
-
-import java.io.RandomAccessFile;
+import java.io.File;
+import java.io.IOException;
 
 public class Main
 {
-    //#region Propriedades
-    Arquivo arqOrd, arqRev, arqRand, auxRev, auxRand;
-    RandomAccessFile tabela;
-    //#endregion
-
     //#region Funções Essenciais
-    public void iniciarVars(){
-        auxRev = new Arquivo("auxRev");
-        auxRand = new Arquivo("auxRand");
-    }
-
-    public void geraTabela()
-    {
-        inicializarTabela();
-        gerarArquivos();
-        insercaoDireta();
-        //insercaoBinaria();
-        fecharTabela();
-    }
-    
-    public void fecharTabela()
+    public final int N = 10;
+    long tini, tfim, ttotalO;
+    int compO, movO;
+    int compOrd, compEqOrd, movOrd, movEqOrd;
+    int compRev, compEqRev, movRev, movEqRev;
+    int compRand, compEqRand, movRand, movEqRand;
+    double tseg, e = 2.71828, g = 0.577216;
+    long tempoOrd, tempoRev, tempoRand;
+    Arquivo arqOrd = new Arquivo("Ordenado");
+    Arquivo arqRev = new Arquivo("Reverso");
+    Arquivo arqRand = new Arquivo("Aleatório");
+    Arquivo arqCopRand = new Arquivo("Aleatório (Cópia)");
+    Tabela tabela;
     {
         try {
-            if (tabela != null) {
-                tabela.close();
-            }
-        } catch (Exception e) {
-            System.err.println("Erro ao fechar tabela: " + e.getMessage());
+            tabela = new Tabela("Tabela");
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
-    
-    public void inicializarTabela()
-    {
-        try {
-            tabela = new RandomAccessFile("tabela_resultados.txt", "rw");
-            String header = String.format("  Métodos Ordenação  |             Arquivo Ordenado                 |          Arquivo em Ordem Reversa            |               Arquivo Randômico              \n");
-            String separador = "-------------------- | -------- -------- -------- -------- -------- | -------- -------- -------- -------- -------- | -------- -------- -------- -------- --------\n";
-            String subheader = String.format("%-20s | %-8s %-8s %-8s %-8s %-8s | %-8s %-8s %-8s %-8s %-8s | %-8s %-8s %-8s %-8s %-8s%n",
-                    "Método",
-                    "Comp. Prog Ordenado", "Comp. ProgEq", "MovO", "MovOEq", "Tempo",
-                    "CompRev", "CompRevEq", "MovRev", "MovRevEq", "TempoRev",
-                    "CompRand", "CompRandEq", "MovRand", "MovRandEq", "TempoRand");
-            tabela.writeBytes(header);
-            tabela.writeBytes(separador);
-            tabela.writeBytes(subheader);
-            tabela.writeBytes(separador);
-        } catch (Exception e) {
-            System.err.println("Erro ao inicializar tabela: " + e.getMessage());
-        }
-    }
-    public void gravaLinhaTabela(String metodo, double compO, double compOEq, double movO, double movOEq, long tempo,
-                                 double compRev, double compRevEq, double movRev, double movRevEq, long tempoRev,
-                                 double compRand, double compRandEq, double movRand, double movRandEq, long tempoRand) {
 
-        String linha = String.format(
-                "%-20s | %-8.2f %-8.2f %-8.2f %-8.2f %-8d | %-8.2f %-8.2f %-8.2f %-8.2f %-8d | %-8.2f %-8.2f %-8.2f %-8.2f %-8d%n",
+    private void gravarLinhaArquivo(String metodo) throws IOException {
+        tabela.gravaLinha(
                 metodo,
-                compO, compOEq, movO, movOEq, tempo,
-                compRev, compRevEq, movRev, movRevEq, tempoRev,
-                compRand, compRandEq, movRand, movRandEq, tempoRand
+                compOrd, compEqOrd, movOrd, movEqOrd, tempoOrd,
+                compRev, compEqRev, movRev, movEqRev, tempoRev,
+                compRand, compEqRand, movRand, movEqRand, tempoRand
         );
+    }
 
-        try {
-            tabela.writeBytes(linha);
-        } catch (Exception e) {
-            System.err.println("Erro ao escrever na tabela: " + e.getMessage());
+    private void start(Arquivo arquivo){
+        arquivo.initComp();
+        arquivo.initMov();
+        tini = System.currentTimeMillis();
+    }
+
+    private void end(Arquivo arquivo) {
+        tfim = System.currentTimeMillis();
+        compO = arquivo.getComp();
+        movO = arquivo.getMov();
+        ttotalO = tfim - tini;
+        tseg = (double) ttotalO / 1000.0; //converter os millisegundos para segundos
+    }
+
+    private void armazenarOrdenado() {
+        compOrd = compO;
+        movOrd = movO;
+        tempoOrd = (long)tseg;
+    }
+
+    private void armazenarReverso() {
+        compRev = compO;
+        movRev = movO;
+        tempoRev = (long)tseg;
+    }
+
+    private void armazenarAleatorio() {
+        compRand = compO;
+        movRand = movO;
+        tempoRand = (long)tseg;
+    }
+
+    private void exibirInfo(Arquivo arquivo) throws IOException {
+        arquivo.exibirArquivo();
+        System.out.println();
+        System.out.println("Segundos: " + tseg);
+        System.out.println("Comp.: "+  compO);
+        System.out.println("Mov: " + movO);
+    }
+    private void excluirArquivos() {
+        // Lista de arquivos a serem excluídos
+        String[] arquivosParaExcluir = {
+                "Ordenado", "Reverso", "Aleatório", "Aleatório (Cópia)",
+                "Contador", "Final", "Arq0", "Arq1", "Arq2", "Arq3", "Arq4",
+                "Esquerda", "Direita", "NoName.bin"
+        };
+
+        for (String nomeArquivo : arquivosParaExcluir) {
+            File arquivo = new File(nomeArquivo);
+            if (arquivo.exists() && arquivo.isFile()) {
+                arquivo.delete();
+            }
         }
-
-        System.out.print(linha);
     }
 
-    public void gerarArquivos(){
-        arqOrd = new Arquivo("arqOrdenado.bin");
-        arqOrd.geraArquivoOrdenado();
+    private void geraArquivos() throws IOException {
+        arqOrd.truncate(0);
+        arqRev.truncate(0);
+        arqCopRand.truncate(0);
 
-        arqRev = new Arquivo("arqReverso.bin");
-        arqRev.geraArquivoReverso();
-
-        arqRand = new Arquivo("arqRandomico.bin");
-        arqRand.geraArquivoRandomico();
+        arqOrd.geraArquivoOrdenado(N);
+        arqRev.geraArquivoReverso(N);
+        arqCopRand.copiaArquivo(arqRand.getArquivo());
     }
+
+    private void geraArquivoAleatorio() throws IOException {
+        arqRand.truncate(0);
+        arqRand.geraArquivoAleatorio(N);
+    }
+
+    public void geraTabela() throws IOException {
+        this.geraArquivoAleatorio();
+
+        for(int i=0; i<=17; i++)
+        {
+            compEqOrd=0;
+            movEqOrd=0;
+            compEqRev=0;
+            movEqRev=0;
+            compEqRand=0;
+            movEqRand=0;
+            geraArquivos();
+            System.out.println();
+            switch(i){
+                case 1:{
+                    //insercao direta
+                    System.out.println("Inserção Direta");
+
+                    this.start(arqOrd);
+                    arqOrd.insercaoDireta();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+                    compEqOrd = N-1;
+                    movEqOrd = 3*(N-1);
+
+                    this.start(arqRev);
+                    arqRev.insercaoDireta();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+                    compEqRev = (int)((Math.pow(N,2) + N - 4)/4);
+                    movEqRev = (int)(Math.pow(N,2) + 3*N - 4)/2;
+
+                    this.start(arqCopRand);
+                    arqCopRand.insercaoDireta();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+                    compEqRand = (int)(Math.pow(N,2) + N - 2)/4;
+                    movEqRand = (int)(Math.pow(N,2) + 9*N - 10)/4;
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Insercao Direta");
+                    break;
+                } /*insercao Direta*/
+                case 2:{
+                    //insercao binaria
+                    System.out.println("Inserção Binária");
+
+                    this.start(arqOrd);
+                    arqOrd.insercaoBinaria();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+                    compEqOrd = (int)(N * (Math.log(N) - Math.log(e) + 0.5));
+                    movEqOrd = 3*(N-1);
+
+                    this.start(arqRev);
+                    arqRev.insercaoBinaria();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+                    compEqRev = (int)(N * (Math.log(N) - Math.log(e) + 0.5));
+                    movEqRev = (int)(Math.pow(N,2) + 9*N - 10)/4;
+
+                    this.start(arqCopRand);
+                    arqCopRand.insercaoBinaria();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+                    compEqRand = (int)(N * (Math.log(N) - Math.log(e) + 0.5));
+                    movEqRand = (int)(Math.pow(N,2) + 3*N - 4)/2;
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Insercao Binaria");
+                    break;
+                } /*insercao Binaria*/
+                case 3:{
+                    //selecao direta
+                    System.out.println("Seleção Direta");
+
+                    this.start(arqOrd);
+                    arqOrd.selectionSort();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+                    compEqOrd = (int)(Math.pow(N,2) - N)/2;
+                    movEqOrd = 3 * (N - 1);
+
+                    this.start(arqRev);
+                    arqRev.selectionSort();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+                    compEqRev = compEqOrd;
+                    movEqRev = (int)(Math.pow(N,2)/4 + 3 * (N - 1));
+
+                    this.start(arqCopRand);
+                    arqCopRand.selectionSort();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+                    compEqRand = compEqOrd;
+                    movEqRand = (int)(N * (Math.log(N) + g));
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Selecao Direta");
+                    break;
+                } /*selecao direta*/
+                case 4:{
+                    //bubble sort
+                    System.out.println("Bubble Sort");
+
+                    this.start(arqOrd);
+                    arqOrd.bubbleSort();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+                    compEqOrd = N-1;
+                    movEqOrd = 0;
+
+                    this.armazenarOrdenado();
+                    this.start(arqRev);
+                    arqRev.bubbleSort();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+                    compEqRev = (int)((Math.pow(N,2) - N)/2);
+                    movEqRev = (int)(3 * (Math.pow(N,2) - N)/2);
+
+                    this.armazenarReverso();
+                    this.start(arqCopRand);
+                    arqCopRand.bubbleSort();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+                    compEqRand = (int)((Math.pow(N,2) - N)/2);
+                    movEqRand = (int)(3 * (Math.pow(N,2) - N)/4);
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Bubble Sort");
+                    break;
+                } /*bubble Sort*/
+                case 5:{
+                    //shake sort
+                    System.out.println("Shake Sort");
+
+                    this.start(arqOrd);
+                    arqOrd.shakeSort();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+                    compEqOrd = N-1;
+                    movEqOrd = 0;
+
+                    this.start(arqRev);
+                    arqRev.shakeSort();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+                    compEqRev = (int)((Math.pow(N,2) - N)/2);
+                    movEqRev = (int)(3 * (Math.pow(N,2) - N)/2);
+
+                    this.start(arqCopRand);
+                    arqCopRand.shakeSort();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+                    compEqRand = (int)((Math.pow(N,2) - N)/2);
+                    movEqRand = (int)(3 * (Math.pow(N,2) - N)/4);
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Shake Sort");
+                    break;
+                } /*shake Sort*/
+                case 6:{
+                    //shell sort
+                    System.out.println("Shell Sort");
+
+                    this.start(arqOrd);
+                    arqOrd.shellSort();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+
+                    this.start(arqRev);
+                    arqRev.shellSort();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+
+                    this.start(arqCopRand);
+                    arqCopRand.shellSort();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Shell Sort");
+                    break;
+                } /*shell sort*/
+                case 7:{
+                    //heap sort
+                    System.out.println("Heap Sort");
+
+                    this.start(arqOrd);
+                    arqOrd.heapSort();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+
+                    this.start(arqRev);
+                    arqRev.heapSort();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+
+                    this.start(arqCopRand);
+                    arqCopRand.heapSort();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Heap Sort");
+                    break;
+                } /*heap sort*/
+                case 8:{
+                    //comb sort
+                    System.out.println("Comb Sort");
+
+                    this.start(arqOrd);
+                    arqOrd.combSort();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+
+                    this.start(arqRev);
+                    arqRev.combSort();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+
+                    this.start(arqCopRand);
+                    arqCopRand.combSort();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Comb Sort");
+                    break;
+                } /*comb sort*/
+                case 9:{
+                    //quick sort sem pivo
+                    System.out.println("Quick Sort SEM Pivo");
+
+                    this.start(arqOrd);
+                    arqOrd.quickSort_nopivot();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+
+                    this.start(arqRev);
+                    arqRev.quickSort_nopivot();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+
+                    this.start(arqCopRand);
+                    arqCopRand.quickSort_nopivot();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Quick SEM Pivo");
+                    break;
+                } /*quick sort sem pivo*/
+                case 10:{
+                    //quick sort com pivo
+                    System.out.println("Quick Sort COM Pivo");
+
+                    this.start(arqOrd);
+                    arqOrd.quickSort_pivot();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+
+                    this.start(arqRev);
+                    arqRev.quickSort_pivot();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+
+                    this.start(arqCopRand);
+                    arqCopRand.quickSort_pivot();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Quick COM Pivo");
+                    break;
+                } /*quick sort com pivo*/
+                case 11:{
+                    //count sort
+                    System.out.println("Count Sort");
+
+                    this.start(arqOrd);
+                    arqOrd.countSort();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+
+                    this.start(arqRev);
+                    arqRev.countSort();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+
+                    this.start(arqCopRand);
+                    arqCopRand.countSort();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Count Sort");
+                    break;
+                } /*count sort*/
+                case 12:{
+                    //radix sort
+                    System.out.println("Radix Sort");
+
+                    this.start(arqOrd);
+                    arqOrd.radixSort();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+
+                    this.start(arqRev);
+                    arqRev.radixSort();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+
+                    this.start(arqCopRand);
+                    arqCopRand.radixSort();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Radix Sort");
+                    break;
+                } /*radix sort*/
+                case 13:{
+                    //bucket sort
+                    System.out.println("Bucket Sort");
+
+                    this.start(arqOrd);
+                    arqOrd.bucketSort();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+
+                    this.start(arqRev);
+                    arqRev.bucketSort();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+
+                    this.start(arqCopRand);
+                    arqCopRand.bucketSort();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Bucket Sort");
+                    break;
+                } /*bucket sort*/
+                case 14:{
+                    //gnome sort
+                    System.out.println("Gnome Sort");
+
+                    this.start(arqOrd);
+                    arqOrd.gnomeSort();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+
+                    this.start(arqRev);
+                    arqRev.gnomeSort();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+
+                    this.start(arqCopRand);
+                    arqCopRand.gnomeSort();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Gnome Sort");
+                    break;
+                } /*gnome sort*/
+                case 15:{
+                    //merge sort primeira implementação
+                    System.out.println("Merge Sort PRIMEIRA Implementação");
+
+                    this.start(arqOrd);
+                    arqOrd.mergeSort_first();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+
+                    this.start(arqRev);
+                    arqRev.mergeSort_first();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+
+                    this.start(arqCopRand);
+                    arqCopRand.mergeSort_first();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Merge MULTIPLOS 2");
+                    break;
+                } /*merge sort primeira implementação*/
+                case 16:{
+                    //merge sort segunda implementação
+                    System.out.println("Merge Sort SEGUNDA Implementação");
+
+                    this.start(arqOrd);
+                    arqOrd.mergeSortSegundaImplement();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+
+                    this.start(arqRev);
+                    arqRev.mergeSortSegundaImplement();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+
+                    this.start(arqCopRand);
+                    arqCopRand.mergeSortSegundaImplement();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Merge Sort");
+                    break;
+                } /*merge sort segunda implementação*/
+                case 17:{
+                    //tim sort
+                    System.out.println("Tim Sort");
+
+                    this.start(arqOrd);
+                    arqOrd.timSort();
+                    this.end(arqOrd);
+                    System.out.print("Arquivo Ordenado: ");
+                    this.exibirInfo(arqOrd);//fim
+                    armazenarOrdenado(); //armazenar os valores das mov e comp
+
+                    this.start(arqRev);
+                    arqRev.timSort();
+                    this.end(arqRev);
+                    System.out.print("Arquivo Reverso: ");
+                    this.exibirInfo(arqRev);//fim
+                    armazenarReverso();
+
+                    this.start(arqCopRand);
+                    arqCopRand.timSort();
+                    this.end(arqCopRand);
+                    System.out.print("Arquivo Aleatorio: ");
+                    this.exibirInfo(arqCopRand);//fim
+                    armazenarAleatorio();
+
+                    //gravar a linha na tabela
+                    gravarLinhaArquivo("Tim Sort");
+                    break;
+                } /*tim sort*/
+            }
+            excluirArquivos();
+        }
+        tabela.fechar();
+    }
+
     //#endregion
 
-    //#region Métodos de Ordenação
-    public void insercaoDireta(){
-        InsercaoDireta _insercaoDireta = new InsercaoDireta();
-        String linha;
 
-        //#region Arquivo Ordenado
-        arqOrd.initComp();
-        arqOrd.initMov();
-        var tempo_ini=System.currentTimeMillis(); //metodo para pegar a hora atual em milisegundos
-        arqOrd.insercaoDireta();
-        var tempo_fim=System.currentTimeMillis(); //metodo para pegar a hora atual em milisegundos
-        var compO=arqOrd.getComp();
-        var movO=arqOrd.getMov();
-        var tempo_totalO=tempo_fim-tempo_ini;
-        //#endregion
-
-        //#region Arquivo Reverso
-        auxRev = new Arquivo("arqReverso - Copia.bin");
-        auxRev.copiaArquivo(arqRev.getFile()); //faz uma cópia do arquivo de arqRev
-        // para auxRev para preservar o original
-        auxRev.initComp();
-        auxRev.initMov();
-        tempo_ini=System.currentTimeMillis();
-        auxRev.insercaoDireta();
-        tempo_fim=System.currentTimeMillis();
-        var tempo_totalRev=tempo_fim-tempo_ini;
-        var compRev=auxRev.getComp();
-        var movRev= auxRev.getMov();
-        //#endregion
-
-        //#region Arquivo Randomico
-        auxRand.copiaArquivo(arqRand.getFile()); //faz uma cópia do arquivo de arqRand
-        //para auxRand para preservar o original
-        auxRand.initComp();
-        auxRand.initMov();
-        tempo_ini=System.currentTimeMillis();
-        auxRand.insercaoDireta();
-        tempo_fim=System.currentTimeMillis();
-        var tempo_totalRand=tempo_fim-tempo_ini;
-        var compRand=auxRand.getComp();
-        var movRand=auxRand.getMov();
-        //#endregion
-
-        //grava na tabela informacoes os dados extraídos das execucoes do metodo
-        gravaLinhaTabela("Inserção Direta", compO,
-                _insercaoDireta.calculaComp(arqOrd.getComp()),
-                movO,
-                _insercaoDireta.calculaMov(arqOrd.getMov()),
-                tempo_totalO,
-                compRev,
-                _insercaoDireta.calculaComp(arqRev.getComp()),
-                movRev,
-                _insercaoDireta.calculaMov(arqRev.getMov()),
-                tempo_totalRev,
-                compRand,
-                _insercaoDireta.calculaComp(arqRand.getComp()),
-                movRand,
-                _insercaoDireta.calculaMov(arqRev.getMov()),
-                tempo_totalRand
-        );
-    }
-
-    public void insercaoBinaria(){
-        InsercaoBinaria _insercaoBinaria = new InsercaoBinaria();
-        String linha;
-
-        //#region Arquivo Ordenado
-        arqOrd.initComp();
-        arqOrd.initMov();
-        var tempo_ini=System.currentTimeMillis(); //metodo para pegar a hora atual em milisegundos
-        arqOrd.insercaoBinaria();
-        var tempo_fim=System.currentTimeMillis(); //metodo para pegar a hora atual em milisegundos
-        var compO=arqOrd.getComp();
-        var movO=arqOrd.getMov();
-        var tempo_totalO=tempo_fim-tempo_ini;
-        //#endregion
-
-        //#region Arquivo Reverso
-        auxRev = new Arquivo("arqReverso - Copia.bin");
-        auxRev.copiaArquivo(arqRev.getFile()); //faz uma cópia do arquivo de arqRev
-        // para auxRev para preservar o original
-        auxRev.initComp();
-        auxRev.initMov();
-        tempo_ini=System.currentTimeMillis();
-        auxRev.insercaoBinaria();
-        tempo_fim=System.currentTimeMillis();
-        var tempo_totalRev=tempo_fim-tempo_ini;
-        var compRev=auxRev.getComp();
-        var movRev= auxRev.getMov();
-        //#endregion
-
-        //#region Arquivo Randomico
-        auxRand.copiaArquivo(arqRand.getFile()); //faz uma cópia do arquivo de arqRand
-        //para auxRand para preservar o original
-        auxRand.initComp();
-        auxRand.initMov();
-        tempo_ini=System.currentTimeMillis();
-        auxRand.insercaoBinaria();
-        tempo_fim=System.currentTimeMillis();
-        var tempo_totalRand=tempo_fim-tempo_ini;
-        var compRand=auxRand.getComp();
-        var movRand=auxRand.getMov();
-        //#endregion
-
-        //grava na tabela informacoes os dados extraídos das execucoes do metodo
-        gravaLinhaTabela("Inserção Binária", compO,
-                _insercaoBinaria.calculaComp(arqOrd.getComp()),
-                movO,
-                _insercaoBinaria.calculaMov(arqOrd.getMov()),
-                tempo_totalO,
-                compRev,
-                _insercaoBinaria.calculaComp(arqRev.getComp()),
-                movRev,
-                _insercaoBinaria.calculaMov(arqRev.getMov()),
-                tempo_totalRev,
-                compRand,
-                _insercaoBinaria.calculaComp(arqRand.getComp()),
-                movRand,
-                _insercaoBinaria.calculaMov(arqRev.getMov()),
-                tempo_totalRand
-        );
-    }
-
-    //#endregion
-
-    public static void main(String args[])
-    {
+    public static void main(String args[]) throws IOException {
         Main p = new Main();
-        p.iniciarVars();
         p.geraTabela();
     }
 }
