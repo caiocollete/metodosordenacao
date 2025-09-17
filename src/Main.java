@@ -4,7 +4,7 @@ import java.io.IOException;
 public class Main
 {
     //#region Funções Essenciais
-    public final int N = 10;
+    public final int N = 1024;
     long tini, tfim, ttotalO;
     int compO, movO;
     int compOrd, compEqOrd, movOrd, movEqOrd;
