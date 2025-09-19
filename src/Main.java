@@ -78,7 +78,7 @@ public class Main
         String[] arquivosParaExcluir = {
                 "Ordenado", "Reverso", "Aleatório", "Aleatório (Cópia)",
                 "Contador", "Final", "Arq0", "Arq1", "Arq2", "Arq3", "Arq4",
-                "Esquerda", "Direita", "NoName.bin"
+                "Esquerda", "Direita", "NoName.bin", "v1", "v2"
         };
 
         for (String nomeArquivo : arquivosParaExcluir) {
@@ -107,7 +107,7 @@ public class Main
     public void geraTabela() throws IOException {
         this.geraArquivoAleatorio();
 
-        for(int i=0; i<=17; i++)
+        for(int i=15; i<=15; i++)
         {
             compEqOrd=0;
             movEqOrd=0;
@@ -582,7 +582,7 @@ public class Main
                     armazenarAleatorio();
 
                     //gravar a linha na tabela
-                    gravarLinhaArquivo("Merge MULTIPLOS 2");
+                    gravarLinhaArquivo("Merge 1");
                     break;
                 } /*merge sort primeira implementação*/
                 case 16:{
@@ -590,28 +590,28 @@ public class Main
                     System.out.println("Merge Sort SEGUNDA Implementação");
 
                     this.start(arqOrd);
-                    arqOrd.mergeSortSegundaImplement();
+                    arqOrd.mergeSort_second();
                     this.end(arqOrd);
                     System.out.print("Arquivo Ordenado: ");
                     this.exibirInfo(arqOrd);//fim
                     armazenarOrdenado(); //armazenar os valores das mov e comp
 
                     this.start(arqRev);
-                    arqRev.mergeSortSegundaImplement();
+                    arqRev.mergeSort_second();
                     this.end(arqRev);
                     System.out.print("Arquivo Reverso: ");
                     this.exibirInfo(arqRev);//fim
                     armazenarReverso();
 
                     this.start(arqCopRand);
-                    arqCopRand.mergeSortSegundaImplement();
+                    arqCopRand.mergeSort_second();
                     this.end(arqCopRand);
                     System.out.print("Arquivo Aleatorio: ");
                     this.exibirInfo(arqCopRand);//fim
                     armazenarAleatorio();
 
                     //gravar a linha na tabela
-                    gravarLinhaArquivo("Merge Sort");
+                    gravarLinhaArquivo("Merge 2");
                     break;
                 } /*merge sort segunda implementação*/
                 case 17:{
