@@ -1,4 +1,4 @@
-﻿package Lista;
+package Lista;
 
 public class No {
     private int info;

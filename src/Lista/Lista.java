@@ -1,4 +1,4 @@
-﻿package Lista;
+package Lista;
 
 public class Lista {
     private No ini;
