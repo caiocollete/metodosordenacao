@@ -1,3 +1,4 @@
+import Lista.ListaEncadeada;
 import metodos.*;
 
 public class Main
@@ -5,6 +6,7 @@ public class Main
     Arquivo arqOrd, arqRev, arqRand, auxRev, auxRand;
 
     public void geraTabela()
+
     {
         insercaoDireta();
         //e assim continua para os outros métodos de ordenacao!!!
@@ -79,10 +81,37 @@ public class Main
                 tempo_totalRand
         );
     }
+    public static void RodarListaEncadeada(){
+        ListaEncadeada lista = new ListaEncadeada();
+        lista.criarElementosRand(32);
+        lista.printarValores();
 
+        //lista.insercaoDireta();
+        //lista.bubbleSort();
+        //lista.shakesort();
+        //lista.selecaoDireta();
+        //lista.combSort();
+        //lista.shellSort();
+        //lista.insercaoBinaria();
+        //lista.heapSort();
+        //lista.quickSortSemPivo();
+        //lista.quickSortComPivo();
+        //lista.countSort();
+        //lista.radixSort();
+        //lista.bucketSort();
+        //lista.gnomeSort();
+        lista.mergeSortPri();
+        //lista.mergeSortSeg();
+
+        lista.printarValores();
+    }
     public static void main(String args[])
     {
-        Main p = new Main();
-        p.geraTabela();
+        //Main p = new Main();
+        //p.geraTabela();
+
+
+        RodarListaEncadeada();
+
     }
 }
