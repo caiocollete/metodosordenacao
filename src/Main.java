@@ -1,3 +1,5 @@
+import Lista.ListaEncadeada;
+import metodos.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -46,6 +48,30 @@ public class Main
         movO = arquivo.getMov();
         ttotalO = tfim - tini;
         tseg = (double) ttotalO / 1000.0; //converter os millisegundos para segundos
+    }
+    public static void RodarListaEncadeada(){
+        ListaEncadeada lista = new ListaEncadeada();
+        lista.criarElementosRand(32);
+        lista.printarValores();
+
+        //lista.insercaoDireta();
+        //lista.bubbleSort();
+        //lista.shakesort();
+        //lista.selecaoDireta();
+        //lista.combSort();
+        //lista.shellSort();
+        //lista.insercaoBinaria();
+        //lista.heapSort();
+        //lista.quickSortSemPivo();
+        //lista.quickSortComPivo();
+        //lista.countSort();
+        //lista.radixSort();
+        //lista.bucketSort();
+        //lista.gnomeSort();
+        lista.mergeSortPri();
+        //lista.mergeSortSeg();
+      
+        lista.printarValores();
     }
 
     private void armazenarOrdenado() {
@@ -655,5 +681,7 @@ public class Main
     public static void main(String args[]) throws IOException {
         Main p = new Main();
         p.geraTabela();
+      
+        //RodarListaEncadeada();
     }
 }
