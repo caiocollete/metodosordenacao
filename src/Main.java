@@ -1,8 +1,6 @@
 import Lista.ListaEncadeada;
-import metodos.*;
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLOutput;
 import java.util.Scanner;
 
 public class Main
@@ -226,7 +224,7 @@ public class Main
     public void geraTabela() throws IOException {
         this.geraArquivoAleatorio();
 
-        for(int i=15; i<=15; i++)
+        for(int i=1; i<=17; i++)
         {
             compEqOrd=0;
             movEqOrd=0;
