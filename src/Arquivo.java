@@ -579,7 +579,7 @@ public class Arquivo{
     //#region Merge Sort (First Implementation)
     public void mergeSort_first(){
         int tl = (int) filesize()/2;
-        int[] v1 = new int[tl], v2 = new int[tl];
+        Arquivo v1 = new Arquivo("v1"), v2 = new Arquivo("v2");
         int seq = 1;
 
         while(seq<filesize()/2){
@@ -589,68 +589,92 @@ public class Arquivo{
         }
     }
 
-    public void particao(int[] v1, int[] v2){
+    public void particao(Arquivo v1, Arquivo v2){
         int i = 0, j = 0, k = 0, tl=(int)filesize()/2;
         Registro reg = new Registro();
+        v1.truncate(0);
+        v2.truncate(0);
         while(k<tl){
             seekArq(k);
             reg.leDoArq(arquivo);
-            v1[i++] = reg.getNumero();
+            v1.seekArq(i++);
+            reg.gravaNoArq(v1.arquivo);
+
             seekArq(k+tl);
             reg.leDoArq(arquivo);
-            v2[j++] = reg.getNumero();
+            v2.seekArq(j++);
+            reg.gravaNoArq(v2.arquivo);
             k++;
         }
     }
 
-    public void fusao(int[] v1, int[] v2, int seq){
-        int i = 0, j = 0, k = 0, tl=(int)filesize()/2, aux = seq;
-        Registro reg = new Registro();
-        while(k<tl){
+    private void fusao(Arquivo arq1, Arquivo arq2, int seq) {
+        int k=0, i=0, j=0, aux_seq=seq;
+        Registro regi = new Registro(), regj = new Registro();
+
+        comp++;
+        while(k<(int)this.filesize()){
+            comp++;
+            comp++;
             while(i<seq && j<seq){
-                if(v1[i]<v2[j]){
-                    seekArq(k++);
-                    reg.setNumero(v1[i++]);
-                    reg.gravaNoArq(arquivo);
+                comp++;
+                arq1.seekArq(i); regi.leDoArq(arq1.getArquivo());
+                arq2.seekArq(j); regj.leDoArq(arq2.getArquivo());
+                comp++;
+                if(regi.getNumero()<regj.getNumero()){
+                    this.seekArq(k); regi.gravaNoArq(this.arquivo);
+                    mov++;
+                    k++;
+                    i++;
                 }
                 else{
-                    seekArq(k++);
-                    reg.setNumero(v2[j++]);
-                    reg.gravaNoArq(arquivo);
+                    this.seekArq(k); regj.gravaNoArq(this.arquivo);
+                    mov++;
+                    k++;
+                    j++;
                 }
             }
+            comp++;
             while(i<seq){
-                seekArq(k++);
-                reg.setNumero(v1[i++]);
-                reg.gravaNoArq(arquivo);
+                comp++;
+                arq1.seekArq(i); regi.leDoArq(arq1.getArquivo());
+                this.seekArq(k); regi.gravaNoArq(this.arquivo);
+                mov++;
+                k++;
+                i++;
             }
+            comp++;
             while(j<seq){
-                seekArq(k++);
-                reg.setNumero(v2[j++]);
-                reg.gravaNoArq(arquivo);
+                comp++;
+                arq2.seekArq(j); regj.leDoArq(arq2.getArquivo());
+                this.seekArq(k); regj.gravaNoArq(this.arquivo);
+                mov++;
+                k++;
+                j++;
             }
-            seq= seq + aux;
+
+            seq += aux_seq;
         }
     }
 
     //#endregion
 
     //#region Merge Sort (Second Implementation - Tree)
-    public void mergeSortSegundaImplement() throws IOException{
+    public void mergeSort_second() throws IOException{
         Arquivo aux = new Arquivo();
-        mergeSegundaImplement(0,(int)this.filesize()-1,aux);
+        merge_second(0,(int)this.filesize()-1,aux);
     } /*merge sort qualquer multiplicidade*/
-    private void mergeSegundaImplement(int esq, int dir, Arquivo aux) throws IOException{
+    private void merge_second(int esq, int dir, Arquivo aux) throws IOException{
         comp++;
         if(esq<dir){
             comp++;
             int meio = (esq+dir)/2;
-            mergeSegundaImplement(esq, meio, aux);
-            mergeSegundaImplement(meio+1, dir, aux);
-            fusaoSegundaImplement(esq, meio, meio+1, dir, aux);
+            merge_second(esq, meio, aux);
+            merge_second(meio+1, dir, aux);
+            fusao_second(esq, meio, meio+1, dir, aux);
         }
     }
-    private void fusaoSegundaImplement(int ini1, int fim1, int ini2, int fim2, Arquivo arqAux) throws IOException {
+    private void fusao_second(int ini1, int fim1, int ini2, int fim2, Arquivo arqAux) throws IOException {
         int i = ini1, j = ini2;
         Registro regi = new Registro(), regj = new Registro();
         arqAux.truncate(0);
