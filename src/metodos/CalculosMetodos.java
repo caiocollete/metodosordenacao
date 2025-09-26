@@ -1,7 +1,7 @@
 package metodos;
 
 public interface CalculosMetodos {
-    int calculaComp(long size);
+    double calculaComp(int n);
 
-    int calculaMov(long size);
+    double calculaMov(int n);
 }
