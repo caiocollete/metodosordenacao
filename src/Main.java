@@ -772,8 +772,11 @@ public class Main
     public static void main(String args[]) throws IOException {
 
         Scanner ler = new Scanner(System.in);
+        System.out.println("Feito por:");
+        System.out.println("CAIO COLLETE SILVA - 262318709");
+        System.out.println("DIOGO DA SILVA PETROSKI - 262227304\n");
 
-        System.out.println("O que quer rodar? (1 - Arquivos ou 2 - Lista Encadeada) ");
+        System.out.println("O que quer rodar? \n1 - Arquivos\n2 - Lista Encadeada");
         switch(ler.nextInt()){
             case 1:
                 Main p = new Main();
