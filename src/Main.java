@@ -1,5 +1,7 @@
+import Lista.ListaEncadeada;
 import java.io.File;
 import java.io.IOException;
+import java.util.Scanner;
 
 public class Main
 {
@@ -46,6 +48,121 @@ public class Main
         movO = arquivo.getMov();
         ttotalO = tfim - tini;
         tseg = (double) ttotalO / 1000.0; //converter os millisegundos para segundos
+    }
+    public static void RodarListaEncadeada(){
+        ListaEncadeada lista = new ListaEncadeada();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Inserção Direta");
+        lista.insercaoDireta();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Bubble Sort");
+        lista.bubbleSort();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Shake Sort");
+        lista.shakesort();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Quick Sort");
+        lista.selecaoDireta();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Comb Sort");
+        lista.combSort();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Shell Sort");
+        lista.shellSort();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Inserção Binaria");
+        lista.insercaoBinaria();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Heap Sort");
+        lista.heapSort();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Quick Sort SEM PIVO");
+        lista.quickSortSemPivo();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Quick Sort COM PIVO");
+        lista.quickSortComPivo();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Count Sort");
+        lista.countSort();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Radix");
+        lista.radixSort();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Bucket");
+        lista.bucketSort();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Gnome");
+        lista.gnomeSort();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Merge Sort PRIMEIRA IMPLEMENTACAO");
+        lista.mergeSortPri();
+        lista.printarValores();
+
+        lista.criarElementosRand(32);
+        System.out.println("\nLista Gerada:");
+        lista.printarValores();
+        System.out.println("Merge Sort SEGUNDA  IMPLEMENTACAO");
+        lista.mergeSortSeg();
+        lista.printarValores();
     }
 
     private void armazenarOrdenado() {
@@ -107,7 +224,7 @@ public class Main
     public void geraTabela() throws IOException {
         this.geraArquivoAleatorio();
 
-        for(int i=15; i<=15; i++)
+        for(int i=1; i<=17; i++)
         {
             compEqOrd=0;
             movEqOrd=0;
@@ -653,7 +770,22 @@ public class Main
 
 
     public static void main(String args[]) throws IOException {
-        Main p = new Main();
-        p.geraTabela();
+
+        Scanner ler = new Scanner(System.in);
+
+        System.out.println("O que quer rodar? (1 - Arquivos ou 2 - Lista Encadeada) ");
+        switch(ler.nextInt()){
+            case 1:
+                Main p = new Main();
+                p.geraTabela();
+                break;
+            case 2:
+                RodarListaEncadeada();
+                break;
+            default:
+             System.out.println("Saindo da aplicação");
+             break;
+        }
+
     }
 }
